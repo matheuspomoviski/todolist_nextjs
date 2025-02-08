@@ -1,40 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# To Do List - Next.js (Em desenvolvimento)
+---
+## Descrição do projeto 
+Esse projeto é um marco zero pra mim, porque é o primeiro projeto pessoal e real que envolve o desenvolvimento tanto do front-end como do back-end. 
+Ele é desenvolvido em Next.js e a lógica do back-end está desenvolvida na pasta *pages/api* que o Next.js fornece para criar rotas de API. Todo o sistema é planejado com React para o front-end e JavaScript para o back-end.
 
-## Getting Started
+A escolha de usar Next.js foi feita por ser uma framework da linguagem JavaScript e que utiliza React, uma bibilioteca que eu estudo desde _dezembro/2024_.
+A lógica é que o usuário crie a sua conta através do site, usando um nome de usuário(podendo ser o próprio nome) e o e-mail que será único em toda a aplicação.
 
-First, run the development server:
+## Tecnologias usadas 
+O foco não é explicar qual a função de cada uma com muito detalhe, mas sim listar o que contém nesse projeto
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Nome | Tipo |função no projeto 
+--- | --- | ---
+HTML | Linguagem de marcação de texto | Estrutura do site para indicar as partes semântica, é como o "esqueleto" da página web
+CSS |  Folhas de estilo  |Estilização de todo o conteúdo visível e as interações da página web
+JavaScript | Linguagem de programação| Linguagem principal com maior importância no projeto, presente desde o framework, Next.js, até a lógica das rotas no back-end
+Next.js | Framework | Facilitador e otimizador do desenvolvimento, abrangendo tanto o front-end quanto o back-end da aplicação
+React | Bibilioteca de JavaScript | Cria interfaces de usuário dinâmicas e interativas de forma eficiente e escalável. Ele permite construir componentes reutilizáveis, otimizar o desempenho da aplicação e facilitar a manutenção do código.
+React-router-dom |Biblioteca externa de React | ferramenta essencial para gerenciar as rotas e a navegação do usuário. Ele permite que você crie Single Page Applications (SPAs), onde a mudança de página ocorre sem a necessidade de recarregar o navegador, proporcionando uma experiência mais fluida e dinâmica para o usuário.
+Axios |Biblioteca de JavaScript| Facilita a realização de requisições HTTP a partir do navegador
+Bcrypt | Biblioteca | É uma função de hash de senha amplamente utilizada e considerada uma das mais seguras disponíveis. Ela é projetada para proteger senhas de usuários, transformando-as em sequências de caracteres aleatórias e irreversíveis, conhecidas como "hashes".
+JSON Web Token | Biblioteca | Ferramenta poderosa para autenticação e autorização em aplicações web e móveis. 
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Estrutura do projeto
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+### Front-end
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+Em desenvolvimento 🛠️
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+### Back-end
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+O back-end dessa aplicação foi criada dentro da pasta _/pages/api_ já que o Next.js permite essa facilidade. 
+Toda a estrutura de rotas segue o padrão API RESTful onde todas as ações em relação a usuários estão na rota __/users__ enquanto a de tarefas na rota __/tasks__.
 
-## Learn More
+O banco de dados utilizado nesse projeto é o MongoDb Atlas.
 
-To learn more about Next.js, take a look at the following resources:
+As rotas estão centralizadas em arquivos separados seguindo a lógica de estrutura do Next.js.
+A api está com divisões para models e controllers
+models | controllers
+-- | --
+Recebe os arquivos Users.js e Tasks.jsque instanciam como os usuários e as tarefas devem ser criados respectivamente | Recebe os arquivos userController.js e tasksController.js que recebem todos os metódos acionados com cada tipo de requisição HTTP
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+__Esse projeto segue em desenvolvimento enquanto você lê esse Readme__
