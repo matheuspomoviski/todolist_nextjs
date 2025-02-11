@@ -1,13 +1,12 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-
+import { Form } from "react-bootstrap";
+import NavBar from "../components/NavBar";
+import Login from "./Login";
 
 export default function Home() {
-  const [data, setData] = useState({})
   
   return (
     <>
-      <h1>Testando Next.js</h1>
+    <Login/>
     </>
   );
 }

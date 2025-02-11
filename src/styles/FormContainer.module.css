@@ -1,0 +1,103 @@
+.container{
+  padding: 1rem 2rem;
+  text-align: center;
+  margin: 0.5rem 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.container h1{
+  margin-bottom: 1rem;
+  font-size: 24px;
+}
+
+.container label{
+  transition: all 0.3s ease;
+}
+
+.formContainer{
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: center;;
+  padding: 3rem 2.6rem;
+  border-radius: 18px;
+  background-color: #333;
+}
+
+.formContainer input:focus{
+  outline: 4px solid green;
+  border: none;
+  background-color: #fff;
+}
+
+
+.formContainer > button{
+  position: absolute;
+  bottom: 10px;
+}
+
+.container button{
+  transition: all 0.3s ease;
+}
+
+.container > button{
+  margin-bottom: 3rem;
+}
+
+.container button:hover{
+  background-color: #333;
+  color: white;
+}
+
+@media (min-width: 1080px){
+  .formContainer{
+    width: 400px !important;
+  }
+}
+
+/* animação register */
+
+.loading-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 150px;
+  background: white; /* Fundo sólido */
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 2;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #3498db;
+  border-top: 4px solid transparent;
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite; /* Ajustei a velocidade */
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+

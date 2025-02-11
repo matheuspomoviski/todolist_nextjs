@@ -1,13 +1,9 @@
-import mongoose from "mongoose";
+// utils/db.js
+import mongoose from 'mongoose';
 
-const stringConexao = process.env.STRING_CONEXAO
+const conect = async () => {
+  if (mongoose.connection.readyState >= 1) return;
+  return mongoose.connect(process.env.STRING_CONEXAO);
+};
 
-export default async function conect() {
-  try {
-    await mongoose.connect(stringConexao)
-    console.log("Conectado ao banco MongoDb", mongoose.connection.name)
-  } catch (error) {
-    console.log(error)
-  }
-}
-
+export default conect;

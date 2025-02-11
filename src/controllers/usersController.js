@@ -35,8 +35,7 @@ const usersController = {
             const userExist = await Users.findOne({ email: email });
             if (userExist) {
                 return res.status(422).json({
-                    mensagem: "Já existe um usuário cadastrado com o email:",
-                    email,
+                    mensagem: "Já existe um usuário cadastrado com esse email"
                 });
             }
             // criptografia da senha
@@ -52,7 +51,7 @@ const usersController = {
             try {
                 await user.save();
                 res.status(201).json({
-                    mensagem: "Usuário criado com sucesso",
+                    mensagem: "Usuário criado com sucesso", user,
                 });
             } catch (error) {
                 console.log(error);
@@ -85,20 +84,19 @@ const usersController = {
             //validando se o usuário existe
             const userExist = await Users.findOne({ email: email });
             if (!userExist) {
-                return res.status(422).json({
-                    mensagem: "Já existe um usuário cadastrado com o email:",
-                    email,
+                return res.status(404).json({
+                    mensagem: "Não existe usuário cadastrado com o email:",
                 });
             }
 
             //validação de senha
-            const validatePassword = bcrypt.compare(
+            const validatePassword =  await bcrypt.compare(
                 password,
                 userExist.password
             );
 
             if (!validatePassword) {
-                res.status(400).json({ Erro: "As senhas não conferem" });
+                res.status(400).json({ mensagem: "Senha inválida" });
             }
             //criacao do token jwt
             try {
@@ -120,13 +118,13 @@ const usersController = {
             } catch (error) {
                 console.log(error);
                 res.status(500).json({
-                    Erro: "Houve um erro na autenticação do usuário",
+                    mensagem: "Houve um erro na autenticação do usuário",
                 });
             }
         } catch (error) {
             console.log(error);
             res.status(500).json({
-                Erro: "Houve um erro ao tentar fazer o login do usuário",
+                mensagem: "Houve um erro ao tentar fazer o login do usuário",
             });
             console.log(error);
         }
@@ -144,7 +142,7 @@ const usersController = {
             console.log(isValidateToken);
             if (!isValidateToken || !user) {
                 res.status(404).json({
-                    Erro: "Usuário não encontrado, autenticação negada",
+                    mensagem: "Usuário não encontrado, autenticação negada",
                 });
             }
             res.json({ user });
@@ -158,7 +156,7 @@ const usersController = {
         const user = await Users.findById(id);
 
         if (!user) {
-            res.status(404).json({ Erro: "Usuário não encontrado" });
+            res.status(404).json({ mensagem: "Usuário não encontrado" });
         }
 
         try {
