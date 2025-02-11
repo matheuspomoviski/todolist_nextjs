@@ -14,6 +14,7 @@ Nome | Tipo |função no projeto
 --- | --- | ---
 HTML | Linguagem de marcação de texto | Estrutura do site para indicar as partes semântica, é como o "esqueleto" da página web
 CSS |  Folhas de estilo  |Estilização de todo o conteúdo visível e as interações da página web
+Bootstrap | Framework |  framework front-end que facilita a criação de sites e aplicações web, oferecendo um conjunto de estilos prontos, componentes e um sistema de layout baseado em grades responsivas.
 JavaScript | Linguagem de programação| Linguagem principal com maior importância no projeto, presente desde o framework, Next.js, até a lógica das rotas no back-end
 Next.js | Framework | Facilitador e otimizador do desenvolvimento, abrangendo tanto o front-end quanto o back-end da aplicação
 React | Bibilioteca de JavaScript | Cria interfaces de usuário dinâmicas e interativas de forma eficiente e escalável. Ele permite construir componentes reutilizáveis, otimizar o desempenho da aplicação e facilitar a manutenção do código.
