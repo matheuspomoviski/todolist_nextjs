@@ -3,7 +3,7 @@ import NavBar from "../components/NavBar";
 
 import styles from "../styles/loadings.module.css";
 
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
 
@@ -18,6 +18,18 @@ const Login = () => {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [successMessage, setSuccessMessage] = useState(false);
+    
+    useEffect(() => {
+        if(successMessage){
+            const timer = setTimeout(() =>{
+                router.push('/PaginaInicial')
+                setLoading(false)
+                setSuccessMessage(false)
+            }, 3000)
+            return () => clearInterval(timer);
+        }
+    }, [successMessage])
+    
 
     //funcoes
     const handleLogin = async (e) => {
@@ -28,12 +40,12 @@ const Login = () => {
         try {
             const response = await axios.post("/api/users/user", loginData);
 
-            if (response.status === 201) {
+            if (response.status === 200) {
                 setFormData({
                     email: "",
                     password: "",
                 });
-                setSuccessMessage(true);
+                setSuccessMessage(true);    
             }
         } catch (error) {
             // Se a resposta foi recebida com erro

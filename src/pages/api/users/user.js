@@ -16,12 +16,13 @@ export default async function handler(req, res) {
                 default:
                     return res.status(400).json({ Erro: "Ação inválida" });
             }
+        } else if (req.method === "GET") {
+            return usersController.validate(req, res);
         } else {
             // Resposta para outros métodos que não sejam POST
             return res.status(405).json({ Erro: "Método não permitido" });
         }
     } catch (error) {
-        console.error("Erro na API:", error);
         return res.status(500).json({ Erro: "Erro interno do servidor" });
     }
 }

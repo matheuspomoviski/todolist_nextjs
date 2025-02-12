@@ -1,173 +1,124 @@
-//imports
+import {serialize} from "cookie"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-//model
 import Users from "../models/Users";
-import mongoose from "mongoose";
-
 import validateToken from "../utils/validateToken";
 
-//CRUD e LOGIN Users
 const usersController = {
-    //Create User
+    // Criar usuário
     create: async (req, res) => {
+        if (req.method !== "POST") {
+            return res.status(405).json({ mensagem: "Método não permitido" });
+        }
+
         try {
-            //coletando valores da requisição
             const { name, email, password } = req.body;
 
-            //validações para não ter cadastro com mesmo email
-            if (!name) {
-                res.status(422).json({
-                    mensagem: "O nome é obrigatório para registro",
-                });
-            }
-            if (!email) {
-                res.status(422).json({
-                    mensagem: "O email é obrigatório para registro",
-                });
-            }
-            if (!password) {
-                res.status(422).json({
-                    mensagem: "A senha é obrigatória para registro",
-                });
+            // Validações
+            if (!name) return res.status(422).json({ mensagem: "O nome é obrigatório" });
+            if (!email) return res.status(422).json({ mensagem: "O email é obrigatório" });
+            if (!password) return res.status(422).json({ mensagem: "A senha é obrigatória" });
+
+            const userExist = await Users.findOne({ email });
+            if (userExist) {
+                return res.status(422).json({ mensagem: "Já existe um usuário cadastrado com esse email" });
             }
 
-            const userExist = await Users.findOne({ email: email });
-            if (userExist) {
-                return res.status(422).json({
-                    mensagem: "Já existe um usuário cadastrado com esse email"
-                });
-            }
-            // criptografia da senha
-            const salt = await bcrypt.genSalt(2);
+            // Hash da senha
+            const salt = await bcrypt.genSalt(10);
             const passwordHashed = await bcrypt.hash(password, salt);
 
-            const user = new Users({
-                name,
-                email,
-                password: passwordHashed,
-            });
-            //criação no banco de dados
-            try {
-                await user.save();
-                res.status(201).json({
-                    mensagem: "Usuário criado com sucesso", user,
-                });
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({
-                    mensagem:
-                        "Houve um erro ao tentar criar o perfil do usuário no banco de dados",
-                });
-            }
+            const user = new Users({ name, email, password: passwordHashed });
+
+            await user.save();
+            return res.status(201).json({ mensagem: "Usuário criado com sucesso", user });
         } catch (error) {
-            console.log(error);
-            res.status(500).json({
-                mensagem: "Não foi possível registrar o usuário",
-            });
+            console.error(error);
+            return res.status(500).json({ mensagem: "Erro ao registrar o usuário" });
         }
     },
-    //Login usuario
+
+    // Login do usuário
     login: async (req, res) => {
-        const { email, password } = req.body;
+        if (req.method !== "POST") {
+            return res.status(405).json({ mensagem: "Método não permitido" });
+        }
+
         try {
-            if (!email) {
-                res.status(422).json({
-                    mensagem: "O email é obrigatório para registro",
-                });
-            }
-            if (!password) {
-                res.status(422).json({
-                    mensagem: "A senha é obrigatória para registro",
-                });
-            }
-            //validando se o usuário existe
-            const userExist = await Users.findOne({ email: email });
-            if (!userExist) {
-                return res.status(404).json({
-                    mensagem: "Não existe usuário cadastrado com o email:",
-                });
-            }
+            const { email, password } = req.body;
 
-            //validação de senha
-            const validatePassword =  await bcrypt.compare(
-                password,
-                userExist.password
-            );
+            if (!email) return res.status(422).json({ mensagem: "O email é obrigatório" });
+            if (!password) return res.status(422).json({ mensagem: "A senha é obrigatória" });
 
-            if (!validatePassword) {
-                res.status(400).json({ mensagem: "Senha inválida" });
-            }
-            //criacao do token jwt
-            try {
-                const secret = process.env.SECRET;
-                const acessToken = jwt.sign(
-                    {
-                        id: userExist.id,
-                    },
-                    secret,
-                    { expiresIn: "1h" }
-                );
+            // Buscar usuário no banco de dados
+            const userExist = await Users.findOne({ email });
+            if (!userExist) return res.status(404).json({ mensagem: "Usuário não encontrado" });
 
-                res.status(201).json({
-                    mensagem: "Autenticação realizada com sucesso",
-                    acessToken: acessToken,
-                    userId: userExist.id,
-                    name: userExist.name,
-                });
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({
-                    mensagem: "Houve um erro na autenticação do usuário",
-                });
-            }
+            // Validar senha
+            const isPasswordValid = await bcrypt.compare(password, userExist.password);
+            if (!isPasswordValid) return res.status(400).json({ mensagem: "Senha inválida" });
+
+            // Criar token JWT
+            const secret = process.env.SECRET;
+            const acessToken = jwt.sign({ id: userExist.id }, secret, { expiresIn: "1h" });
+
+            // Criar cookie
+            res.setHeader("Set-Cookie", serialize("acessToken", acessToken, {
+                httpOnly: true,
+                sameSite: "strict",
+                secure: process.env.NODE_ENV === "production",
+                path: "/",
+                maxAge: 60 * 60, // 1 hora
+            }));
+
+            return res.status(200).json({ mensagem: "Autenticação realizada com sucesso" });
         } catch (error) {
-            console.log(error);
-            res.status(500).json({
-                mensagem: "Houve um erro ao tentar fazer o login do usuário",
-            });
-            console.log(error);
+            console.error(error);
+            return res.status(500).json({ mensagem: "Erro na autenticação do usuário" });
         }
     },
-    //validacao token
+
+    // Validar token
     validate: async (req, res) => {
-        const id = req.query.id;
-        const authHeader = req.headers["authorization"];
-        const token = authHeader && authHeader.split(" ")[1];
-        //verificar se existe o usuário
         try {
-            const user = await Users.findById(id, "-password");
+            const token = req.cookies.acessToken; // Pega o token diretamente dos cookies
 
-            const isValidateToken = await validateToken(token);
-            console.log(isValidateToken);
-            if (!isValidateToken || !user) {
-                res.status(404).json({
-                    mensagem: "Usuário não encontrado, autenticação negada",
-                });
+            if (!token) {
+                return res.status(401).json({ mensagem: "Token não encontrado" });
             }
-            res.json({ user });
+            const isValidateToken = await validateToken(token);
+            if (!isValidateToken) {
+                return res.status(403).json({ mensagem: "Autenticação negada" });
+            }
+            const user = await Users.findById(isValidateToken.id).select("-password")
+
+            if(!user){
+                return res.status(404).json({mensagem: "Usuário não encontrado"})
+            }
+            return res.status(200).json({ mensagem: "Acesso permitido", user});
         } catch (error) {
-            console.log(error);
+            return res.status(500).json({ mensagem: "Erro na validação do token" });
         }
     },
-    delete: async (req, res) => {
-        const id = req.query.id;
-        //verificando se existe esse id
-        const user = await Users.findById(id);
 
-        if (!user) {
-            res.status(404).json({ mensagem: "Usuário não encontrado" });
+    // Excluir usuário
+    delete: async (req, res) => {
+        if (req.method !== "DELETE") {
+            return res.status(405).json({ mensagem: "Método não permitido" });
         }
 
         try {
-            const deletedUser = await Users.findByIdAndDelete(id);
+            const { id } = req.query;
 
-            res.status(200).json({
-                deletedUser,
-                mensagem: "Usuário excluído com sucesso ",
-            });
+            // Verifica se o usuário existe
+            const user = await Users.findById(id);
+            if (!user) return res.status(404).json({ mensagem: "Usuário não encontrado" });
+
+            await Users.findByIdAndDelete(id);
+            return res.status(200).json({ mensagem: "Usuário excluído com sucesso" });
         } catch (error) {
-            console.log(error);
+            console.error(error);
+            return res.status(500).json({ mensagem: "Erro ao excluir usuário" });
         }
     },
 };
