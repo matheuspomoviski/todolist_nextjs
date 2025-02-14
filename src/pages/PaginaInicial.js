@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import axiosInstance from "../utils/axiosConfig";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useTask } from "../utils/ContextApi";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen, faXmark, faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import formatDate from "../utils/formatData";
@@ -10,6 +12,8 @@ import styles from "../styles/PaginaInicial.module.css";
 
 const PaginaInicial = () => {
     const router = useRouter();
+    const { setTaskToEdit } = useTask();
+
     const [user, setUser] = useState(null);
     const [tasks, setTasks] = useState([]);
     const [newTask, setNewTask] = useState({
@@ -26,7 +30,6 @@ const PaginaInicial = () => {
                 const { name, email, _id: userId } = response.data.user;
                 setUser({ name, email, userId });
             } catch (error) {
-                console.error("Erro ao carregar dados do usuário:", error);
                 if (error.response && error.response.status === 401) {
                     router.push("/Login");
                 }
@@ -41,15 +44,22 @@ const PaginaInicial = () => {
         if (!user || !user.userId) return;
         try {
             const response = await axiosInstance.get("/api/tasks/task", {
-                params: { userId: user.userId }
+                params: { userId: user.userId },
             });
 
-            if (Array.isArray(response.data) || (response.data && Array.isArray(response.data.tasks))) {
-                const tasksData = Array.isArray(response.data) ? response.data : response.data.tasks;
+            if (
+                Array.isArray(response.data) ||
+                (response.data && Array.isArray(response.data.tasks))
+            ) {
+                const tasksData = Array.isArray(response.data)
+                    ? response.data
+                    : response.data.tasks;
 
-                const formattedTasks = tasksData.map(task => ({
+                const formattedTasks = tasksData.map((task) => ({
                     ...task,
-                    date: task.date ? new Date(task.date).toLocaleDateString('pt-BR') : ""
+                    date: task.date
+                        ? new Date(task.date).toLocaleDateString("pt-BR")
+                        : "",
                 }));
 
                 setTasks(formattedTasks);
@@ -82,7 +92,10 @@ const PaginaInicial = () => {
             }
 
             const taskData = { ...newTask, userId: user.userId };
-            const response = await axiosInstance.post("/api/tasks/task", taskData);
+            const response = await axiosInstance.post(
+                "/api/tasks/task",
+                taskData
+            );
             console.log("Tarefa criada:", response.data);
 
             if (response.status === 201) {
@@ -94,6 +107,41 @@ const PaginaInicial = () => {
         } catch (error) {
             console.error("Erro na requisição:", error);
         }
+    };
+
+    // Funções para ações com as tasks
+    const handleUpdatedTask = async (taskId) => {
+        const taskToUpdate = tasks.find((task) => task._id === taskId);
+
+        if (!taskToUpdate) {
+            return;
+        }
+
+        try {
+            // Atualiza o estado local das tarefas
+            setTasks((prevTasks) =>
+                prevTasks.map((task) =>
+                    task._id === taskId
+                        ? { ...task, status: !task.status }
+                        : task
+                )
+            );
+
+            // Envia apenas a atualização do status
+            const updatedTask = {
+                status: !taskToUpdate.status, // Apenas o status é atualizado
+            };
+
+            await axiosInstance.put(`/api/tasks/${taskId}`, updatedTask);
+            await fetchTasks(); // Atualiza a lista de tarefas
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleEdit = (task) => {
+        setTaskToEdit(task);
+        router.push("/EditTask")
     };
 
     if (isLoading) {
@@ -119,11 +167,15 @@ const PaginaInicial = () => {
                     <h2 className="fs-4 mt-4 text-center">
                         Adicione novas tarefas:
                     </h2>
-                    <div className=" bg-secondary p-3 rounded-3">
+                    <div className="bg-secondary p-3 rounded-3">
                         <label className={styles.label} htmlFor="title">
                             Título da tarefa:
                         </label>
-                        <input className={styles.input} type="text" name="title" id="title"
+                        <input
+                            className={styles.input}
+                            type="text"
+                            name="title"
+                            id="title"
                             placeholder="Participar da reunião..."
                             required
                             value={newTask.title}
@@ -142,35 +194,58 @@ const PaginaInicial = () => {
                             className={styles.date}
                             onChange={handleChange}
                         />
-                        <button
-                            className={styles.button}
-                            type="submit"
-                        >
+                        <button className={styles.button} type="submit">
                             Criar tarefa
                         </button>
                     </div>
                 </form>
 
                 {tasks.length > 0 ? (
-                    tasks.map((task) => (
+                    tasks.map((task) =>
                         task && task.title ? (
-                            <div key={task._id || task.id || `task-${Math.random()}`} className={styles.tasksCard}>
-                                <p>{task.title}</p>
-                                <p>prazo: {task.date}</p>
-                                <button className={styles.btnPen}>
-                                    <FontAwesomeIcon icon={faPen} />
-                                </button>
-                                <button className={styles.btnXmark}>
-                                    <FontAwesomeIcon icon={faXmark} />
-                                </button>
-                                <button className={styles.btnCheck}>
-                                    <FontAwesomeIcon icon={faCheck} />
-                                </button>
+                            <div
+                                key={task._id}
+                                className={`${styles.tasksCard} ${
+                                    task.status ? styles.completedTask : ""
+                                }`}
+                                id={task._id}
+                            >
+                                <div className={styles.text}>
+                                    <p>{task.title}</p>
+                                    <p>prazo: {task.date}</p>
+                                </div>
+                                <div className={styles.buttons}>
+                                    <button
+                                        className={styles.btnPen}
+                                        onClick={() =>
+                                            handleEdit({
+                                                title: task.title,
+                                                date: task.date,
+                                                id: task._id,
+                                            })
+                                        }
+                                    >
+                                        <FontAwesomeIcon icon={faPen} />
+                                    </button>
+                                    <button className={styles.btnXmark}>
+                                        <FontAwesomeIcon icon={faXmark} />
+                                    </button>
+                                    <button
+                                        className={styles.btnCheck}
+                                        onClick={() =>
+                                            handleUpdatedTask(task._id)
+                                        }
+                                    >
+                                        <FontAwesomeIcon icon={faCheck} />
+                                    </button>
+                                </div>
                             </div>
                         ) : null
-                    ))
+                    )
                 ) : (
-                    <p className="text-body-tertiary">Nenhuma tarefa adicionada ainda</p>
+                    <p className="text-body-tertiary">
+                        Nenhuma tarefa adicionada ainda
+                    </p>
                 )}
             </div>
         </>
