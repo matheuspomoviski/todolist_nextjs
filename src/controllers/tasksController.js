@@ -47,15 +47,18 @@ const tasksController = {
     },
     getTasks: async (req, res) => {
       try {
-        const userId = req.body.userId;
-        const tasks = await Task.find({userId});
-        if(tasks == 0){
-          res.status(404).json({mensagem: "Nenhuma tarefa encontrada para esse usuário"})
+        const userId = req.query.userId;
+        console.log(userId)
+        const tasks = await Task.find({ userId });
+    
+        if (tasks.length === 0) { // Corrigido para verificar se o array está vazio
+          return res.status(200).json({ tasks: [] }); // Adicione o return aqui
         }
-        res.status(200).json(tasks)
+    
+        res.status(200).json(tasks);
       } catch (error) {
-        console.log(error)
-        res.status(500).json({mensagem: "Houve um erro ao tentar consultar as tarefas desse usuário"})
+        console.log(error);
+        res.status(500).json({ mensagem: "Houve um erro ao tentar consultar as tarefas desse usuário" });
       }
     },
     update: async (req, res) => {

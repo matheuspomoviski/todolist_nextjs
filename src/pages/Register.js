@@ -9,7 +9,10 @@ import styles from "../styles/loadings.module.css";
 
 const Register = () => {
     const router = useRouter();
-
+    //states
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -17,9 +20,18 @@ const Register = () => {
         confirmPassword: "",
     });
 
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState("");
+    //funcoes para eventos
+    useEffect(() => {
+        if(successMessage){
+            const timer = setTimeout(() =>{
+                router.push('/Login')
+                setLoading(false)
+                setSuccessMessage(false)
+            },3000)
+            return () => clearInterval(timer)
+        }
+    }, [successMessage])
+    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -36,7 +48,6 @@ const Register = () => {
             }
         }
     };
-
     const handleRegister = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -67,6 +78,7 @@ const Register = () => {
         }
     };
 
+    //array para os inputs
     const inputs = [
         {
             type: "text",

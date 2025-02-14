@@ -17,10 +17,6 @@
   box-shadow: 3px 0 10px rgba(0, 0, 0, 0.573);
 }
 
-.loading span{
-  margin-bottom: 1rem;
-}
-
 .loading-spiner {
   width: 30px;
   height: 30px;
