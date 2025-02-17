@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axiosInstance from "../utils/axiosConfig";
 import { useRouter } from "next/router";
 import NavBar from "../components/NavBar";
@@ -13,16 +13,23 @@ import styles from "../styles/PaginaInicial.module.css";
 const PaginaInicial = () => {
     const router = useRouter();
     const { setTaskToEdit } = useTask();
+    const taskIdToRemove = useRef(null)
 
+    // States
     const [user, setUser] = useState(null);
     const [tasks, setTasks] = useState([]);
     const [newTask, setNewTask] = useState({
         title: "",
         date: "",
     });
+    const [taskRemove, setTaskRemove] = useState(null);
     const [loginDate] = useState(formatDate());
     const [isLoading, setLoading] = useState(true);
+    const [confirm, setConfirm] = useState(false);
+    const [isDisable, setIsDisable] = useState(false);
+    const [awaiting, setAwaiting] = useState(false);
 
+    // Função para carregar o usuário
     useEffect(() => {
         const userData = async () => {
             try {
@@ -40,6 +47,7 @@ const PaginaInicial = () => {
         userData();
     }, []);
 
+    // Função para carregar as tarefas
     const fetchTasks = async () => {
         if (!user || !user.userId) return;
         try {
@@ -77,6 +85,7 @@ const PaginaInicial = () => {
         fetchTasks();
     }, [user?.userId]);
 
+    // Funções para manipulação das tarefas
     const handleChange = (e) => {
         const { name, value } = e.target;
         setNewTask({ ...newTask, [name]: value });
@@ -109,7 +118,7 @@ const PaginaInicial = () => {
         }
     };
 
-    // Funções para ações com as tasks
+    // Atualizar o status de uma tarefa
     const handleUpdatedTask = async (taskId) => {
         const taskToUpdate = tasks.find((task) => task._id === taskId);
 
@@ -139,24 +148,43 @@ const PaginaInicial = () => {
         }
     };
 
+    // Editar uma tarefa
     const handleEdit = (task) => {
         setTaskToEdit(task);
-        router.push("/EditTask")
+        router.push("/EditTask");
     };
 
-    if (isLoading) {
-        return (
-            <>
-                <NavBar />
-                <div className={styles.loading}>
-                    <p>Carregando...</p>
-                    <div className="d-flex justify-content-center align-items-center mt-2">
-                        <div className={styles["loading-spiner"]}></div>
-                    </div>
-                </div>
-            </>
-        );
-    }
+    // Remover uma tarefa
+    const handleRemove = (id) => {
+        taskIdToRemove.current = id;
+        const taskToRemove = tasks.find((task) => task._id === taskIdToRemove.current);
+
+        setTaskRemove(taskToRemove);
+        setIsDisable(true);
+        setConfirm(true);
+    };
+
+    const handleConfirm = async () => {
+        const { _id: taskId } = taskRemove;
+        setAwaiting(true);
+        try {
+            const response = await axiosInstance.delete(`/api/tasks/${taskId}`);
+            console.log(response.data);
+            setAwaiting(false);
+            setConfirm(false);
+            setIsDisable(false);
+            await fetchTasks();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleCancel = () => {
+        setConfirm(false);
+        setIsDisable(false);
+        setAwaiting(false);
+    };
+
 
     return (
         <>
@@ -180,6 +208,7 @@ const PaginaInicial = () => {
                             required
                             value={newTask.title}
                             onChange={handleChange}
+                            disabled={isDisable}
                         />
                         <label className={styles.label} htmlFor="date">
                             Prazo limite para conclusão:
@@ -193,8 +222,10 @@ const PaginaInicial = () => {
                             value={newTask.date}
                             className={styles.date}
                             onChange={handleChange}
+                            disabled={isDisable}
                         />
-                        <button className={styles.button} type="submit">
+                        <button className={styles.button} type="submit"
+                            disabled={isDisable}>
                             Criar tarefa
                         </button>
                     </div>
@@ -224,10 +255,14 @@ const PaginaInicial = () => {
                                                 id: task._id,
                                             })
                                         }
+                                        disabled={isDisable}
                                     >
                                         <FontAwesomeIcon icon={faPen} />
                                     </button>
-                                    <button className={styles.btnXmark}>
+                                    <button className={styles.btnXmark}
+                                        onClick={() => handleRemove(task._id)}
+                                        disabled={isDisable}
+                                    >
                                         <FontAwesomeIcon icon={faXmark} />
                                     </button>
                                     <button
@@ -235,6 +270,7 @@ const PaginaInicial = () => {
                                         onClick={() =>
                                             handleUpdatedTask(task._id)
                                         }
+                                        disabled={isDisable}
                                     >
                                         <FontAwesomeIcon icon={faCheck} />
                                     </button>
@@ -246,6 +282,26 @@ const PaginaInicial = () => {
                     <p className="text-body-tertiary">
                         Nenhuma tarefa adicionada ainda
                     </p>
+                )}
+                {confirm && taskRemove && (
+                    <div className={styles.confirmContainer}>
+                        <p>Tem certeza que deseja excluir a tarefa:</p>
+                        <p>{taskRemove.title}</p>
+                        <div className={styles.buttons}>
+                            <button className={styles.cancelButton}
+                                onClick={handleCancel}>Cancelar</button>
+                            <button className={styles.confirmButton}
+                                onClick={handleConfirm}>Confirmar</button>
+                            {awaiting && (
+                                <div className={styles.confirmLoading}>
+                                    <p>Excluindo...</p>
+                                    <div className="d-flex justify-content-center align-items-center mt-2">
+                                        <div className={styles["loading-spiner"]}></div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 )}
             </div>
         </>

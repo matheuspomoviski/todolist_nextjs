@@ -1,0 +1,15 @@
+.buttonLogout{
+  border: none;
+  background-color: transparent;
+  color: #f5f7f9;
+  padding: 0.5rem;
+  border-radius: 0.8rem;
+  position: absolute;
+  right: 15px;
+  transition: 0.4s ease;
+}
+
+.buttonLogout:hover{
+  background-color: #f8f8f8;
+  color: #333;
+}

@@ -154,11 +154,56 @@
 }
 
 .completedTask{
-  background-color: greenyellow;
+  background-color: rgb(123, 205, 0);
   opacity: 0.3;
   transition: 0.3s ease;
+  color: #fff;
+  font-weight: 600;
 }
 
 .completedTask:hover{
   opacity: 1;
+}
+
+.confirmContainer{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #f5f5f5;
+  padding: 2rem 3rem;
+  border-radius: 1rem;
+}
+
+.confirmContainer .buttons button{
+  margin: 1rem;
+  padding: .5rem;
+  border: none;
+  border-radius: .5rem;
+  font-weight: 500;
+  background-color: #f7f8f9;
+  color: #ccc;
+  cursor: pointer;
+  transition: 0.4s ease;
+}
+
+.confirmContainer .buttons .cancelButton:hover{
+  color: #fff;
+  background-color: rgb(226, 0, 0);
+}
+
+.confirmContainer .buttons .confirmButton:hover{
+  color: #fff;
+  background-color: green;
+}
+
+.confirmLoading{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
