@@ -108,7 +108,7 @@ const Register = () => {
 
     return (
         <>
-            <NavBar />
+            <NavBar showLogout={false} />
             <FormContainer
                 inputs={inputs}
                 titulo="Crie a sua conta para adicionar e gerenciar suas tarefas"

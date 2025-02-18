@@ -13,7 +13,7 @@ import styles from "../styles/PaginaInicial.module.css";
 const PaginaInicial = () => {
     const router = useRouter();
     const { setTaskToEdit } = useTask();
-    const taskIdToRemove = useRef(null)
+    const taskIdToRemove = useRef(null);
 
     // States
     const [user, setUser] = useState(null);
@@ -66,7 +66,12 @@ const PaginaInicial = () => {
                 const formattedTasks = tasksData.map((task) => ({
                     ...task,
                     date: task.date
-                        ? new Date(task.date).toLocaleDateString("pt-BR")
+                        ? new Date(task.date).toLocaleDateString("pt-BR", {
+                                timeZone: "UTC",
+                                year: "numeric",
+                                month: "2-digit",
+                                day: "2-digit",
+                        })
                         : "",
                 }));
 
@@ -157,7 +162,9 @@ const PaginaInicial = () => {
     // Remover uma tarefa
     const handleRemove = (id) => {
         taskIdToRemove.current = id;
-        const taskToRemove = tasks.find((task) => task._id === taskIdToRemove.current);
+        const taskToRemove = tasks.find(
+            (task) => task._id === taskIdToRemove.current
+        );
 
         setTaskRemove(taskToRemove);
         setIsDisable(true);
@@ -185,51 +192,56 @@ const PaginaInicial = () => {
         setAwaiting(false);
     };
 
-
     return (
         <>
-            <NavBar />
+            <NavBar showLogout={true} />
             <div className="w-100 mt-5 d-flex flex-column justify-content-center align-items-center">
                 <h1>Olá, bem-vindo {user?.name}</h1>
-                <form onSubmit={handleCreate} className="form-floating mb-4">
-                    <h2 className="fs-4 mt-4 text-center">
-                        Adicione novas tarefas:
-                    </h2>
-                    <div className="bg-secondary p-3 rounded-3">
-                        <label className={styles.label} htmlFor="title">
-                            Título da tarefa:
-                        </label>
-                        <input
-                            className={styles.input}
-                            type="text"
-                            name="title"
-                            id="title"
-                            placeholder="Participar da reunião..."
-                            required
-                            value={newTask.title}
-                            onChange={handleChange}
-                            disabled={isDisable}
-                        />
-                        <label className={styles.label} htmlFor="date">
-                            Prazo limite para conclusão:
-                        </label>
-                        <input
-                            type="date"
-                            name="date"
-                            id="date"
-                            min={loginDate}
-                            required
-                            value={newTask.date}
-                            className={styles.date}
-                            onChange={handleChange}
-                            disabled={isDisable}
-                        />
-                        <button className={styles.button} type="submit"
-                            disabled={isDisable}>
-                            Criar tarefa
-                        </button>
-                    </div>
-                </form>
+
+                <div className={styles.form}>
+                    <form onSubmit={handleCreate} className="form-floating mb-4">
+                        <h2 className="fs-4 mt-4 text-center">
+                            Adicione novas tarefas:
+                        </h2>
+                        <div className="bg-secondary p-3 rounded-3 ">
+                            <label className={styles.label} htmlFor="title">
+                                Título da tarefa:
+                            </label>
+                            <input
+                                className={styles.input}
+                                type="text"
+                                name="title"
+                                id="title"
+                                placeholder="Participar da reunião..."
+                                required
+                                value={newTask.title}
+                                onChange={handleChange}
+                                disabled={isDisable}
+                            />
+                            <label className={styles.label} htmlFor="date">
+                                Prazo limite para conclusão:
+                            </label>
+                            <input
+                                type="date"
+                                name="date"
+                                id="date"
+                                min={loginDate}
+                                required
+                                value={newTask.date}
+                                className={styles.date}
+                                onChange={handleChange}
+                                disabled={isDisable}
+                            />
+                            <button
+                                className={styles.button}
+                                type="submit"
+                                disabled={isDisable}
+                            >
+                                Criar tarefa
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
                 {tasks.length > 0 ? (
                     tasks.map((task) =>
@@ -259,7 +271,8 @@ const PaginaInicial = () => {
                                     >
                                         <FontAwesomeIcon icon={faPen} />
                                     </button>
-                                    <button className={styles.btnXmark}
+                                    <button
+                                        className={styles.btnXmark}
                                         onClick={() => handleRemove(task._id)}
                                         disabled={isDisable}
                                     >
@@ -288,15 +301,25 @@ const PaginaInicial = () => {
                         <p>Tem certeza que deseja excluir a tarefa:</p>
                         <p>{taskRemove.title}</p>
                         <div className={styles.buttons}>
-                            <button className={styles.cancelButton}
-                                onClick={handleCancel}>Cancelar</button>
-                            <button className={styles.confirmButton}
-                                onClick={handleConfirm}>Confirmar</button>
+                            <button
+                                className={styles.cancelButton}
+                                onClick={handleCancel}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                className={styles.confirmButton}
+                                onClick={handleConfirm}
+                            >
+                                Confirmar
+                            </button>
                             {awaiting && (
                                 <div className={styles.confirmLoading}>
                                     <p>Excluindo...</p>
                                     <div className="d-flex justify-content-center align-items-center mt-2">
-                                        <div className={styles["loading-spiner"]}></div>
+                                        <div
+                                            className={styles["loading-spiner"]}
+                                        ></div>
                                     </div>
                                 </div>
                             )}
@@ -305,7 +328,7 @@ const PaginaInicial = () => {
                 )}
             </div>
         </>
-    );
-};
+    )
+}
 
-export default PaginaInicial;
+export default PaginaInicial

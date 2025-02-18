@@ -53,40 +53,42 @@ const EditTask = () => {
 
     return (
         <>
-            <NavBar />
+            <NavBar showLogout={true} />
             <div className="w-100 mt-5 d-flex flex-column justify-content-center align-items-center">
                 <h1>Edite a sua tarefa:</h1>
 
-                <form className="form-floating mb-4" onSubmit={handleSubmit}>
-                    <div className="bg-secondary p-3 rounded-3">
-                        <label className={styles.label} htmlFor="title">
-                            Novo título da tarefa:
-                        </label>
-                        <input
-                            className={styles.input}
-                            type="text"
-                            name="title"
-                            id="title"
-                            placeholder={taskToEdit.title}
-                            onChange={handleChange}
-                        />
-                        <label className={styles.label} htmlFor="date">
-                            Novo prazo para conclusão:
-                        </label>
-                        <input
-                            type="date"
-                            name="date"
-                            id="date"
-                            min={loginDate}
-                            //pensar na lógica para definir a data
-                            className={styles.date}
-                            onChange={handleChange}
-                        />
-                        <button className={styles.button} type="submit">
-                            Atualizar tarefa
-                        </button>
-                    </div>
-                </form>
+                <div className={styles.form}>
+                    <form className="form-floating mb-4" onSubmit={handleSubmit}>
+                        <div className="bg-secondary p-3 rounded-3">
+                            <label className={styles.label} htmlFor="title">
+                                Novo título da tarefa:
+                            </label>
+                            <input
+                                className={styles.input}
+                                type="text"
+                                name="title"
+                                id="title"
+                                placeholder={taskToEdit.title}
+                                onChange={handleChange}
+                            />
+                            <label className={styles.label} htmlFor="date">
+                                Novo prazo para conclusão:
+                            </label>
+                            <input
+                                type="date"
+                                name="date"
+                                id="date"
+                                min={loginDate}
+                                //pensar na lógica para definir a data
+                                className={styles.date}
+                                onChange={handleChange}
+                            />
+                            <button className={styles.button} type="submit">
+                                Atualizar tarefa
+                            </button>
+                        </div>
+                    </form>
+                </div>
                 <div className={styles.tasksCard}>
                     <div className={styles.text}>
                         <p>{taskToEdit.title}</p>

@@ -1,51 +1,45 @@
 import FormContainer from "../components/FormContainer";
 import NavBar from "../components/NavBar";
 
-import styles from "../styles/loadings.module.css";
-
 import { useState, useEffect} from "react";
 import { useRouter } from "next/router";
-import {useAuth} from "../utils/AuthContext"
+import { useAuth } from "../utils/AuthContext";
+import axiosInstance from "../utils/axiosConfig"; // Adicionando a importação para axiosInstance
 
 const Login = () => {
     const router = useRouter();
-    const {login, loading, user} = useAuth();
+    const { login } = useAuth(); // Só estamos consumindo o estado 'user' do contexto
     const [formData, setFormData] = useState({
         email: "",
         password: "",
     });
     const [error, setError] = useState("");
     const [successMessage, setSuccessMessage] = useState(false);
-    
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         if(successMessage){
-            const timer = setTimeout(() =>{
-                router.push('/PaginaInicial')
-            }, 3000)
-            setSuccessMessage(false)
+                router.push('/PaginaInicial');
+            setSuccessMessage(false);
             return () => clearInterval(timer);
         }
-    }, [successMessage])
-    
+    }, [successMessage]);
 
-    //funcoes
+    // Função de login
     const handleLogin = async (e) => {
         e.preventDefault();
-        setError("")
-        const loginData = { ...formData, action: "login" };
+        setLoading(true); // Inicia o estado de carregamento
 
-        try {
-            await login(formData.email, formData.password)
-            if (user) {
-                setSuccessMessage(true);    
-            }
-        } catch (error) {
-            // Se a resposta foi recebida com erro
-            if (error.response) {
-                setLoading(false);
-                setError(error.response.data.mensagem); // Exibindo a mensagem do erro da API
-            }
+        const result = await login(formData); // Chama a função de login do contexto
+
+        if (result.success) {
+            setFormData({ email: "", password: "" }); // Limpar campos após sucesso
+            setSuccessMessage(true); // Define a mensagem de sucesso para redirecionamento
+        } else {
+            setError(result.message); // Define a mensagem de erro retornada pela função de login
         }
+
+        setLoading(false); // Finaliza o estado de carregamento
     };
 
     const handleInputChange = (e) => {
@@ -71,38 +65,25 @@ const Login = () => {
             label: "Senha",
             id: "password",
         },
-    ];
+    ]
+
     return (
         <>
-            <NavBar />
+            <NavBar showLogout={false} />
             <FormContainer
                 inputs={inputs}
                 titulo="Entre para adicionar e gerenciar suas tarefas"
                 buttonLink={"Criar conta"}
-                buttonText={"Entrar"}
+                buttonText={loading ? "Carregando..." : "Entrar"} // Alterando o texto do botão durante o carregamento
                 paragraphText={"Não tem uma conta?"}
                 onSubmit={handleLogin}
                 formData={formData}
                 handleInputChange={handleInputChange}
                 error={error}
                 onButtonClick={() => {
-                    router.push("/Register");
+                    router.push("/Register")
                 }}
             />
-            {loading && (
-                <div className={styles.loading}>
-                    Entrando...
-                    <div className="d-flex justify-content-center align-itens-center mt-2">
-                        <div className={styles["loading-spiner"]}></div>
-                    </div>
-                </div>
-            )}
-            {successMessage && (
-                <p>
-                    Login realizado, redirecionando para a página
-                    principal...
-                </p>
-            )}
         </>
     );
 };

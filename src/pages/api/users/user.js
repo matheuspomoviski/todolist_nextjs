@@ -13,6 +13,8 @@ export default async function handler(req, res) {
                     return usersController.create(req, res);
                 case "login":
                     return usersController.login(req, res);
+                case "logout":
+                    return usersController.logout(req, res);
                 default:
                     return res.status(400).json({ Erro: "Ação inválida" });
             }

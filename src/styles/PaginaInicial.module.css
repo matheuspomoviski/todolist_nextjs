@@ -207,3 +207,56 @@
   justify-content: center;
   align-items: center;
 }
+
+/* media queries */
+
+@media (min-width: 320px) and (max-width: 674px) {
+  .tasksCard{
+    width: 300px;
+  }
+  .text p{
+    font-size: 12px;
+    margin-right: 0.3rem;
+  }
+  .tasksCard button{
+    font-size: 1rem;
+    padding: 0.3rem;
+  }
+  .form form > div{
+    width: 80vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .input, .date{
+    margin-bottom: 0.7rem;
+  }
+  .confirmContainer{
+    width: 360px;
+  }
+}
+@media(min-width: 675px) and (max-width: 1000px) {
+  .tasksCard{
+    width: 650px;
+  }
+  .text p{
+    font-size: 16px;
+    margin-right: 0.3rem;
+  }
+  .tasksCard button{
+    font-size: 1rem;
+    padding: 0.6rem;
+  }
+  .form form > div{
+    width: 70vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .input, .date{
+    margin-bottom: 0.7rem;
+  }
+  .confirmContainer{
+    width: 360px;
+  }
+}

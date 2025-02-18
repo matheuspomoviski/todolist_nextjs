@@ -1,59 +1,62 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axiosInstance from "./axiosConfig";
 import { useRouter } from "next/router";
-
 import styles from "../styles/PaginaInicial.module.css";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
+    const [user, setUser ] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [formData, setFormData] = useState({ email: "", password: "" });
-    const router = useRouter(); // Use o hook do Next.js para navegação
+    const router = useRouter();
 
     useEffect(() => {
         const checkAuthStatus = async () => {
             try {
                 const response = await axiosInstance.get("/api/users/user");
-                setUser(response.data); // Armazenar os dados do usuário
+                setUser (response.data);
             } catch (error) {
                 console.log(error);
-                setUser(null); // Garantir que o usuário esteja como null em caso de erro
+                setUser (null);
             } finally {
-                setLoading(false);
+                setLoading(false); // Finaliza o loading independentemente do resultado
             }
         };
+
         checkAuthStatus();
     }, []);
 
-    // Função de login
-    const login = async (email, password, action = "login") => {
-        setLoading(true);
-        const loginData = { email, password, action };
+    const login = async (formData) => {
+        const loginData = { email: formData.email, password: formData.password, action: "login" };
         try {
-            await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 segundo de delay extra
-            const response = await axiosInstance.post(
-                "/api/users/user",
-                loginData
-            );
+            const response = await axiosInstance.post("/api/users/user", loginData);
             if (response.status === 200) {
-                setFormData({ email: "", password: "" }); // Limpar campos após sucesso
-                setUser(response.data); // Armazenar os dados do usuário
-                router.push("/PaginaInicial"); // Redirecionar para página após login bem-sucedido
+                setUser (response.data.user);
+                router.push("/PaginaInicial")
+                return { success: true }; // Retorna sucesso
+
+            } else {
+                return { success: false, message: response.data.mensagem }; // Retorna mensagem de erro
             }
         } catch (error) {
             console.log(error);
-        } finally {
-            setLoading(false);
+            // Verifica se a resposta da API contém uma mensagem de erro
+            if (error.response && error.response.data && error.response.data.mensagem) {
+                return { success: false, message: error.response.data.mensagem }; // Retorna mensagem de erro específica da API
+            } else {
+                return { success: false, message: "Falha ao tentar fazer login. Verifique suas credenciais." };
+            }
         }
     };
 
-    // Função de logout
-    const logout = () => {
-        setUser(null); // Limpar o estado do usuário
-        document.cookie = "token=; path=/"; // Limpar o cookie
-        router.push("/Login"); // Redirecionar para página de login após logout
+    const logout = async (action = "logout") => {
+        try {
+            await axiosInstance.post("/api/users/user", { action });
+            setUser (null);
+            router.push("/Login");
+        } catch (error) {
+            console.log("Erro ao fazer logout:", error);
+        }
     };
 
     if (loading) {
@@ -65,7 +68,6 @@ export function AuthProvider({ children }) {
                 </div>
             </div>
         );
-        // Mostrar o loading até a autenticação ser verificada
     }
 
     return (
@@ -76,5 +78,5 @@ export function AuthProvider({ children }) {
 }
 
 export function useAuth() {
-    return useContext(AuthContext);
+    return useContext(AuthContext)
 }
