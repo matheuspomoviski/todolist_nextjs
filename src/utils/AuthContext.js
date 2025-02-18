@@ -14,17 +14,18 @@ export function AuthProvider({ children }) {
         const checkAuthStatus = async () => {
             try {
                 const response = await axiosInstance.get("/api/users/user");
-                setUser (response.data);
+                setUser(response.data);
             } catch (error) {
                 console.log(error);
-                setUser (null);
+                setUser(null);
             } finally {
                 setLoading(false); // Finaliza o loading independentemente do resultado
             }
         };
-
+    
         checkAuthStatus();
     }, []);
+    
 
     const login = async (formData) => {
         const loginData = { email: formData.email, password: formData.password, action: "login" };

@@ -328,7 +328,7 @@ const PaginaInicial = () => {
                 )}
             </div>
         </>
-    )
-}
+    );
+};
 
-export default PaginaInicial
+export default PaginaInicial;

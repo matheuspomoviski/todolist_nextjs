@@ -18,29 +18,31 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if(successMessage){
-                router.push('/PaginaInicial');
+        if (successMessage) {
+            router.push("/PaginaInicial");
             setSuccessMessage(false);
-            return () => clearInterval(timer);
         }
     }, [successMessage]);
+    
 
     // Função de login
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true); // Inicia o estado de carregamento
-
+    
         const result = await login(formData); // Chama a função de login do contexto
-
+    
         if (result.success) {
             setFormData({ email: "", password: "" }); // Limpar campos após sucesso
-            setSuccessMessage(true); // Define a mensagem de sucesso para redirecionamento
+            router.push("/PaginaInicial"); // Redireciona diretamente após login
         } else {
             setError(result.message); // Define a mensagem de erro retornada pela função de login
         }
-
+    
         setLoading(false); // Finaliza o estado de carregamento
     };
+    
+    
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
