@@ -18,16 +18,39 @@ Bootstrap | Framework |  framework front-end que facilita a criação de sites e
 JavaScript | Linguagem de programação| Linguagem principal com maior importância no projeto, presente desde o framework, Next.js, até a lógica das rotas no back-end
 Next.js | Framework | Facilitador e otimizador do desenvolvimento, abrangendo tanto o front-end quanto o back-end da aplicação
 React | Bibilioteca de JavaScript | Cria interfaces de usuário dinâmicas e interativas de forma eficiente e escalável. Ele permite construir componentes reutilizáveis, otimizar o desempenho da aplicação e facilitar a manutenção do código.
-React-router-dom |Biblioteca externa de React | ferramenta essencial para gerenciar as rotas e a navegação do usuário. Ele permite que você crie Single Page Applications (SPAs), onde a mudança de página ocorre sem a necessidade de recarregar o navegador, proporcionando uma experiência mais fluida e dinâmica para o usuário.
 Axios |Biblioteca de JavaScript| Facilita a realização de requisições HTTP a partir do navegador
 Bcrypt | Biblioteca | É uma função de hash de senha amplamente utilizada e considerada uma das mais seguras disponíveis. Ela é projetada para proteger senhas de usuários, transformando-as em sequências de caracteres aleatórias e irreversíveis, conhecidas como "hashes".
 JSON Web Token | Biblioteca | Ferramenta poderosa para autenticação e autorização em aplicações web e móveis. 
+Cookies | Biblioteca | Permite ler, escrever e assinar cookies de forma segura em aplicações back-end. Nessa aplicação está agilizando o processo de autenticação com token
 
 ## Estrutura do projeto
 
 ### Front-end
 
-Em desenvolvimento 🛠️
+## Front-end  
+
+O front-end do projeto foi desenvolvido utilizando **Next.js**, garantindo uma experiência otimizada com renderização híbrida e performance aprimorada.  
+
+### Tecnologias e Funcionalidades  
+
+| Tecnologia | Descrição |
+|------------|-----------|
+| **Next.js** | Framework baseado em React que permite criação de páginas dinâmicas e server-side rendering. |
+| **useRouter** | Hook do Next.js utilizado para gerenciar a navegação entre as páginas do sistema. |
+| **Autenticação de Usuário** | O acesso ao sistema é protegido, garantindo que cada usuário possa visualizar e gerenciar apenas suas próprias tarefas. |
+| **Next API Routes** | A comunicação com o back-end é feita por meio das rotas de API do Next.js, possibilitando operações como login, cadastro e gerenciamento de tarefas. |
+
+### Cadastro e Login  
+
+Para acessar o sistema, o usuário precisa preencher o **formulário de cadastro**, informando:  
+- **E-mail único**  
+- **Nome de usuário**  
+- **Senha segura**  
+
+Após o cadastro, ele será **redirecionado para a página de login**, onde precisará autenticar suas credenciais antes de realizar qualquer ação no sistema.  
+
+O projeto foi estruturado para proporcionar uma interface intuitiva e segura, garantindo que os usuários possam gerenciar suas tarefas de forma eficiente.  
+
 
 ### Back-end
 
